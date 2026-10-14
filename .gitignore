@@ -1,0 +1,19 @@
+# Java / Maven
+backend/target/
+*.class
+
+# Node
+frontend/node_modules/
+frontend/dist/
+
+# IDEs
+.idea/
+.vscode/
+*.iml
+
+# Secrets and local config
+.env
+*.local
+
+# Scraper cache
+backend/scraper-cache/
