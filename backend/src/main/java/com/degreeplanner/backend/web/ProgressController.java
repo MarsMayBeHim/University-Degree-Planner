@@ -1,7 +1,10 @@
 package com.degreeplanner.backend.web;
 
 import com.degreeplanner.backend.dto.ProgressDto;
+import com.degreeplanner.backend.security.CurrentUser;
 import com.degreeplanner.backend.service.ProgressService;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -10,9 +13,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/me/progress")
 public class ProgressController {
 
-    // Temporary: replaced by the logged-in user in Part 7
-    private static final Long TEST_USER_ID = 1L;
-
     private final ProgressService service;
 
     public ProgressController(ProgressService service) {
@@ -20,7 +20,7 @@ public class ProgressController {
     }
 
     @GetMapping
-    public ProgressDto progress() {
-        return service.progress(TEST_USER_ID);
+    public ProgressDto progress(@AuthenticationPrincipal Jwt jwt) {
+        return service.progress(CurrentUser.id(jwt));
     }
 }

@@ -79,3 +79,19 @@ export type GenerationResult = {
   semestersUsed: number;
   unplaced: { code: string; reason: string }[];
 };
+
+export type User = {
+  id: number;
+  email: string;
+  programId: number | null;
+  startYear: number | null;
+  startTerm: 'FALL' | 'SPRING' | null;
+};
+
+export type Program = {
+  id: number;
+  name: string;
+  degreeType: string;
+  catalogYear: string;
+  totalCredits: number;
+};
