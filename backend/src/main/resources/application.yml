@@ -10,5 +10,10 @@ spring:
   flyway:
     enabled: true
 
+app:
+  jwt:
+    secret: ${JWT_SECRET:dev-only-secret-change-me-this-is-at-least-32-bytes-long}
+    expiry-hours: 24
+
 server:
   port: 8080

@@ -76,3 +76,11 @@ main:has(.roadmap) { max-width: 1300px; }
 .icon-btn:hover:not(:disabled) { background: transparent; color: #b42318; }
 .generator { display: flex; flex-wrap: wrap; gap: 1rem; align-items: center; margin-bottom: 1rem; }
 .generator > div { flex-basis: 100%; }
+.spacer { flex: 1; }
+nav span { color: white; }
+nav button { border-color: white; color: white; background: transparent; }
+nav button:hover:not(:disabled) { background: white; color: #006633; }
+.auth-box { max-width: 420px; margin: 2rem auto; }
+.auth-box label { display: block; margin-bottom: 1rem; font-weight: 600; }
+.auth-box input, .auth-box select { display: block; width: 100%; max-width: none; margin-top: 0.3rem; padding: 0.6rem; font-size: 1rem; box-sizing: border-box; }
+.inline { display: flex; gap: 0.5rem; }
