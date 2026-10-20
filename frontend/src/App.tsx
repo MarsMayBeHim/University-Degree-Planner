@@ -2,6 +2,7 @@ import { Link, Route, Routes } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { api } from './api/client';
 import CatalogPage from './pages/CatalogPage';
+import MyCoursesPage from './pages/MyCoursesPage';
 
 
 function Home() {
@@ -26,11 +27,13 @@ export default function App() {
       <nav>
         <Link to="/">Home</Link>
         <Link to="/catalog">Catalog</Link>
+        <Link to="/my-courses">My Courses</Link>
       </nav>
       <main>
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/catalog" element={<CatalogPage />} />
+          <Route path="/my-courses" element={<MyCoursesPage />} />
         </Routes>
       </main>
     </>
