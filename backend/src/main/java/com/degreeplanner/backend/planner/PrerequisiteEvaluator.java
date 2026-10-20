@@ -35,4 +35,22 @@ public final class PrerequisiteEvaluator {
             case AND, OR -> node.children().forEach(c -> collectUnmet(c, completed, out));
         }
     }
+
+        /** Every course code mentioned anywhere in the tree. */
+    public static Set<String> referencedCodes(PrereqNode node) {
+        Set<String> out = new LinkedHashSet<>();
+        collectReferenced(node, out);
+        return out;
+    }
+
+    private static void collectReferenced(PrereqNode node, Set<String> out) {
+        if (node == null) {
+            return;
+        }
+        if (node.type() == PrereqNode.Type.COURSE) {
+            out.add(node.code());
+        } else {
+            node.children().forEach(c -> collectReferenced(c, out));
+        }
+    }
 }

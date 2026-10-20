@@ -74,3 +74,5 @@ main:has(.roadmap) { max-width: 1300px; }
 .overlay-card { box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2); cursor: grabbing; }
 .icon-btn { padding: 0 0.4rem; border: none; background: transparent; color: #9aa5b1; font-size: 1rem; }
 .icon-btn:hover:not(:disabled) { background: transparent; color: #b42318; }
+.generator { display: flex; flex-wrap: wrap; gap: 1rem; align-items: center; margin-bottom: 1rem; }
+.generator > div { flex-basis: 100%; }
