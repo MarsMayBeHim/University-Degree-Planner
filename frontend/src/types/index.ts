@@ -25,3 +25,28 @@ export type StudentCourse = {
   plannedYear: number | null;
   plannedTerm: string | null;
 };
+
+export type GroupProgress = {
+  id: number;
+  name: string;
+  ruleType: 'ALL' | 'CHOOSE_N' | 'MIN_CREDITS';
+  done: boolean;
+  coursesCompleted: number;
+  coursesRequired: number | null;
+  creditsEarned: number;
+  creditsRequired: number | null;
+  completedCourses: string[];
+  remainingCourses: string[];
+  children: GroupProgress[];
+};
+
+export type Progress = {
+  programId: number;
+  programName: string;
+  catalogYear: string;
+  totalCreditsRequired: number;
+  creditsCompleted: number;
+  creditsPlanned: number;
+  trackedRequirementsMet: boolean;
+  groups: GroupProgress[];
+};

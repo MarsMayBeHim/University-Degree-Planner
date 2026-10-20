@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { api } from './api/client';
 import CatalogPage from './pages/CatalogPage';
 import MyCoursesPage from './pages/MyCoursesPage';
+import DashboardPage from './pages/DashboardPage';
 
 
 function Home() {
@@ -28,12 +29,14 @@ export default function App() {
         <Link to="/">Home</Link>
         <Link to="/catalog">Catalog</Link>
         <Link to="/my-courses">My Courses</Link>
+        <Link to="/dashboard">Dashboard</Link>
       </nav>
       <main>
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/catalog" element={<CatalogPage />} />
           <Route path="/my-courses" element={<MyCoursesPage />} />
+          <Route path="/dashboard" element={<DashboardPage />} />
         </Routes>
       </main>
     </>
