@@ -4,6 +4,7 @@ import { api } from './api/client';
 import CatalogPage from './pages/CatalogPage';
 import MyCoursesPage from './pages/MyCoursesPage';
 import DashboardPage from './pages/DashboardPage';
+import RoadmapPage from './pages/RoadmapPage';
 
 
 function Home() {
@@ -30,6 +31,7 @@ export default function App() {
         <Link to="/catalog">Catalog</Link>
         <Link to="/my-courses">My Courses</Link>
         <Link to="/dashboard">Dashboard</Link>
+        <Link to="/roadmap">Roadmap</Link>
       </nav>
       <main>
         <Routes>
@@ -37,6 +39,7 @@ export default function App() {
           <Route path="/catalog" element={<CatalogPage />} />
           <Route path="/my-courses" element={<MyCoursesPage />} />
           <Route path="/dashboard" element={<DashboardPage />} />
+          <Route path="/roadmap" element={<RoadmapPage />} />
         </Routes>
       </main>
     </>

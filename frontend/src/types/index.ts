@@ -50,3 +50,26 @@ export type Progress = {
   trackedRequirementsMet: boolean;
   groups: GroupProgress[];
 };
+
+export type PlannedCourse = {
+  courseId: number;
+  code: string;
+  title: string;
+  credits: number;
+  prereqText: string | null;
+  missingPrereqs: string[];
+};
+
+export type Semester = {
+  year: number;
+  term: string;
+  label: string;
+  credits: number;
+  courses: PlannedCourse[];
+};
+
+export type Plan = {
+  startYear: number;
+  startTerm: string;
+  semesters: Semester[];
+};
