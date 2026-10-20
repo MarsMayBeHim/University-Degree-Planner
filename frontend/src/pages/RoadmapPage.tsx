@@ -9,7 +9,7 @@ import {
 import type { DragEndEvent, DragStartEvent } from '@dnd-kit/core';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { searchCourses } from '../api/courses';
-import { getPlan } from '../api/plan';
+import { generatePlan, getPlan } from '../api/plan';
 import { getMyCourses, removeMyCourse, saveMyCourse } from '../api/studentCourses';
 import DraggableCourse from '../components/DraggableCourse';
 import type { DragCourse } from '../components/DraggableCourse';
@@ -21,6 +21,7 @@ export default function RoadmapPage() {
   const [active, setActive] = useState<DragCourse | null>(null);
   const q = useDebounce(text, 300);
   const queryClient = useQueryClient();
+  const [maxCredits, setMaxCredits] = useState(12);
 
   // A small drag distance lets plain clicks on buttons still work
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }));
@@ -38,6 +39,7 @@ export default function RoadmapPage() {
 
   const save = useMutation({ mutationFn: saveMyCourse, onSuccess: refresh });
   const remove = useMutation({ mutationFn: removeMyCourse, onSuccess: refresh });
+  const generate = useMutation({ mutationFn: () => generatePlan(maxCredits), onSuccess: refresh });
 
   function handleDragStart(e: DragStartEvent) {
     setActive((e.active.data.current?.course as DragCourse | undefined) ?? null);
@@ -73,6 +75,51 @@ export default function RoadmapPage() {
     <>
       <h1>Four-Year Roadmap</h1>
       <p>Drag courses into a semester. Drag cards between semesters to move them.</p>
+
+    <div className="panel generator">
+     <label>
+       Max credits per semester{' '}
+       <input
+         type="number"
+         min={3}
+         max={24}
+         value={maxCredits}
+         onChange={(e) => setMaxCredits(Number(e.target.value))}
+         style={{ width: '5rem' }}
+       />
+     </label>
+     <button
+       disabled={generate.isPending}
+       onClick={() => {
+         if (window.confirm('This replaces every course you have planned so far. Continue?')) {
+           generate.mutate();
+         }
+       }}
+     >
+       {generate.isPending ? 'Generating...' : 'Generate My Degree Plan'}
+     </button>
+
+     {generate.isError && <p className="warn">Could not generate a plan.</p>}
+     {generate.data && (
+       <div>
+         <p className="ok">
+           Placed {generate.data.coursesPlaced} courses across {generate.data.semestersUsed} semesters.
+         </p>
+         {generate.data.unplaced.length > 0 && (
+           <>
+             <p className="warn">These could not be placed:</p>
+             <ul>
+               {generate.data.unplaced.map((u) => (
+                 <li key={u.code}>
+                   <strong>{u.code}</strong>: {u.reason}
+                 </li>
+               ))}
+             </ul>
+           </>
+         )}
+       </div>
+     )}
+   </div>
 
       <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
         <div className="roadmap">

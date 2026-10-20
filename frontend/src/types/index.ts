@@ -73,3 +73,9 @@ export type Plan = {
   startTerm: string;
   semesters: Semester[];
 };
+
+export type GenerationResult = {
+  coursesPlaced: number;
+  semestersUsed: number;
+  unplaced: { code: string; reason: string }[];
+};
