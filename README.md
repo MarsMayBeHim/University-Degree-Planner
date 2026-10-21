@@ -57,10 +57,8 @@ React app  -->  Spring Boot REST API  -->  PostgreSQL
 ```
 backend/    Spring Boot API (controllers, services, planner logic, Flyway migrations)
 frontend/   React app
-docs/       Notes and design decisions, including local development setup
 ```
 
-Setup instructions for working on the project locally are in [docs/development.md](docs/development.md).
 
 ## Roadmap
 
@@ -75,7 +73,7 @@ Setup instructions for working on the project locally are in [docs/development.m
 
 ## Authors
 
-- [Your Name](https://github.com/MarsMayBeHim)
+- [Marwan Abdelrehim](https://github.com/MarsMayBeHim)
 
 ## License
 
