@@ -34,10 +34,11 @@ export default function DashboardPage() {
       ))}
 
       <p className="note">
-        Natural science, most of Mason Core, CS-related electives and free electives are not
-        tracked yet, so finishing everything above does not mean the degree is complete. This
-        planner assumes you already meet all grade and admission requirements. Confirm your
-        plan with your advisor.
+        Mason Core categories, natural science, CS-related electives and free electives appear as
+        placeholder slots (for example MCORE LIT). Mark a slot completed when you have taken any
+        approved course for it, and check your degree audit for which courses qualify. This planner
+        assumes you already meet all grade and admission requirements. Confirm your plan with your
+        advisor.
       </p>
     </>
   );
