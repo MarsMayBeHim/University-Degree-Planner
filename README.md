@@ -49,7 +49,7 @@ React app  -->  Spring Boot REST API  -->  PostgreSQL
 ## Data and limitations
 
 - The degree data is entered by hand, because the catalog site does not allow automated access. Only BS Computer Science (2025-2026) is included so far.
-- Natural science, most of Mason Core, CS-related electives and free electives aren't modeled yet, so a generated plan covers roughly 73 of the 120 credits.
+- Natural science, Mason Core categories, CS-related electives and free electives are tracked as placeholder slots (for example `MCORE LIT`) rather than specific courses. A student marks a slot completed when they've taken any approved course for it.
 - Some courses have prerequisites that haven't been verified, and the planner treats those as having none.
 - Every course is assumed to be offered every Fall and Spring. Summer terms and corequisites aren't supported.
 

@@ -21,7 +21,7 @@ export default function RoadmapPage() {
   const [active, setActive] = useState<DragCourse | null>(null);
   const q = useDebounce(text, 300);
   const queryClient = useQueryClient();
-  const [maxCredits, setMaxCredits] = useState(12);
+  const [maxCredits, setMaxCredits] = useState(16);
 
   // A small drag distance lets plain clicks on buttons still work
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }));
