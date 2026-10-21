@@ -72,7 +72,7 @@ frontend/   React app
 
 ## Authors
 
-- [Your Name](https://github.com/MarsMayBeHim)
+- [Marwan Abdelrehim](https://github.com/MarsMayBeHim)
 
 ## License
 
