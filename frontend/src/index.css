@@ -84,3 +84,5 @@ nav button:hover:not(:disabled) { background: white; color: #006633; }
 .auth-box label { display: block; margin-bottom: 1rem; font-weight: 600; }
 .auth-box input, .auth-box select { display: block; width: 100%; max-width: none; margin-top: 0.3rem; padding: 0.6rem; font-size: 1rem; box-sizing: border-box; }
 .inline { display: flex; gap: 0.5rem; }
+.light { color: #8a6100; font-weight: 600; }
+.generator label { font-weight: 600; }

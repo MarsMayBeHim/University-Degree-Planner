@@ -2,14 +2,15 @@ import { useDroppable } from '@dnd-kit/core';
 import type { Semester } from '../types';
 import DraggableCourse from './DraggableCourse';
 
-const MAX_CREDITS = 18;
-
 type Props = {
   semester: Semester;
+  min: number;
+  max: number;
+  light: boolean;
   onRemove: (courseId: number) => void;
 };
 
-export default function SemesterColumn({ semester, onRemove }: Props) {
+export default function SemesterColumn({ semester, min, max, light, onRemove }: Props) {
   const { setNodeRef, isOver } = useDroppable({
     id: `${semester.year}-${semester.term}`,
     data: { year: semester.year, term: semester.term },
@@ -19,10 +20,12 @@ export default function SemesterColumn({ semester, onRemove }: Props) {
     <div ref={setNodeRef} className={`semester ${isOver ? 'over' : ''}`}>
       <div className="semester-head">
         <span>{semester.label}</span>
-        <span className={semester.credits > MAX_CREDITS ? 'warn' : ''}>
+        <span className={semester.credits > max ? 'warn' : light ? 'light' : ''}>
           {semester.credits} cr
         </span>
       </div>
+      {semester.credits > max && <small className="warn">Over the {max}-credit limit</small>}
+      {light && <small className="light">Under the {min}-credit minimum</small>}
 
       {semester.courses.length === 0 && <small>Drop courses here</small>}
 

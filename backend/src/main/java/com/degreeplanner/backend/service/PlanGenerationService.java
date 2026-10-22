@@ -43,9 +43,12 @@ public class PlanGenerationService {
     }
 
     @Transactional
-    public GenerationResultDto generate(Long userId, int maxCredits) {
+    public GenerationResultDto generate(Long userId, int minCredits, int maxCredits) {
         if (maxCredits < 3 || maxCredits > 24) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "maxCredits must be between 3 and 24");
+        }
+        if (minCredits < 0 || minCredits > maxCredits) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "minCredits must be between 0 and maxCredits");
         }
         AppUser user = users.findById(userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
@@ -85,7 +88,7 @@ public class PlanGenerationService {
         PlanGenerator.Result result;
         try {
             result = PlanGenerator.generate(needed, done,
-                    new PlanGenerator.Settings(user.getStartYear(), startTerm, SEMESTER_COUNT, maxCredits));
+            new PlanGenerator.Settings(user.getStartYear(), startTerm, SEMESTER_COUNT, minCredits, maxCredits));
         } catch (IllegalStateException e) {
             throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_CONTENT, e.getMessage());
         }
@@ -106,7 +109,10 @@ public class PlanGenerationService {
         List<GenerationResultDto.Unplaced> unplaced = result.unplaced().stream()
                 .map(u -> new GenerationResultDto.Unplaced(u.code(), u.reason()))
                 .toList();
-        return new GenerationResultDto(result.placements().size(), semestersUsed, unplaced);
+        List<GenerationResultDto.LightSemester> light = result.lightSemesters().stream()
+                .map(s -> new GenerationResultDto.LightSemester(label(s.term(), s.year()), s.credits()))
+                .toList();
+        return new GenerationResultDto(result.placements().size(), semestersUsed, unplaced, light);
     }
 
     private Map<Long, Set<String>> loadOfferings() {
@@ -126,5 +132,8 @@ public class PlanGenerationService {
 
     private static String code(Course c) {
         return c.getSubject() + " " + c.getNumber();
+    }
+    private static String label(String term, int year) {
+        return term.charAt(0) + term.substring(1).toLowerCase() + " " + year;
     }
 }

@@ -18,7 +18,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/me/plan")
 public class PlanController {
 
-    private static final int DEFAULT_MAX_CREDITS = 12;
+    private static final int DEFAULT_MIN_CREDITS = 12;
+    private static final int DEFAULT_MAX_CREDITS = 16;
 
     private final PlanService planService;
     private final PlanGenerationService generationService;
@@ -36,9 +37,12 @@ public class PlanController {
     @PostMapping("/generate")
     public GenerationResultDto generate(@AuthenticationPrincipal Jwt jwt,
                                         @RequestBody(required = false) GenerateRequest request) {
-        int maxCredits = request == null || request.maxCredits() == null
+        int min = request == null || request.minCredits() == null
+                ? DEFAULT_MIN_CREDITS
+                : request.minCredits();
+        int max = request == null || request.maxCredits() == null
                 ? DEFAULT_MAX_CREDITS
                 : request.maxCredits();
-        return generationService.generate(CurrentUser.id(jwt), maxCredits);
+        return generationService.generate(CurrentUser.id(jwt), min, max);
     }
 }

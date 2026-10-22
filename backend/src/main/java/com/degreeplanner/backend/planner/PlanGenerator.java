@@ -12,13 +12,20 @@ import java.util.Set;
 
 public final class PlanGenerator {
 
-    public record Settings(int startYear, String startTerm, int semesterCount, int maxCredits) {}
+    public record Settings(int startYear, String startTerm, int semesterCount, int minCredits, int maxCredits) {
+        // Keeps older callers and tests working: no minimum
+        public Settings(int startYear, String startTerm, int semesterCount, int maxCredits) {
+            this(startYear, startTerm, semesterCount, 0, maxCredits);
+        }
+    }
 
     public record Placement(int semesterIndex, int year, String term, String code) {}
 
     public record Unplaced(String code, String reason) {}
 
-    public record Result(List<Placement> placements, List<Unplaced> unplaced) {}
+    public record LightSemester(int year, String term, int credits) {}
+
+    public record Result(List<Placement> placements, List<Unplaced> unplaced, List<LightSemester> lightSemesters) {}
 
     private PlanGenerator() {}
 
@@ -32,6 +39,7 @@ public final class PlanGenerator {
         Set<String> available = new HashSet<>(completed);
         Set<String> placed = new HashSet<>();
         List<Placement> placements = new ArrayList<>();
+        List<LightSemester> semesterTotals = new ArrayList<>();
 
         int year = settings.startYear();
         String term = settings.startTerm();
@@ -56,6 +64,7 @@ public final class PlanGenerator {
                     placements.add(new Placement(i, year, semTerm, c.code()));
                 }
             }
+            semesterTotals.add(new LightSemester(year, semTerm, credits));
 
             // Courses only satisfy prerequisites for LATER semesters
             available.addAll(thisSemester);
@@ -85,7 +94,14 @@ public final class PlanGenerator {
             }
             unplaced.add(new Unplaced(c.code(), reason));
         }
-        return new Result(placements, unplaced);
+        int lastUsed = placements.stream().mapToInt(Placement::semesterIndex).max().orElse(-1);
+        List<LightSemester> light = new ArrayList<>();
+        for (int i = 0; i < lastUsed; i++) {
+            if (semesterTotals.get(i).credits() < settings.minCredits()) {
+                light.add(semesterTotals.get(i));
+            }
+        }
+        return new Result(placements, unplaced, light);
     }
 
     /** Length of the longest chain of needed courses that depends on each course. */
