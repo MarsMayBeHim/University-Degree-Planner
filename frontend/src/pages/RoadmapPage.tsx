@@ -16,6 +16,11 @@ import type { DragCourse } from '../components/DraggableCourse';
 import SemesterColumn from '../components/SemesterColumn';
 import { useDebounce } from '../hooks/useDebounce';
 
+function storedNumber(key: string, fallback: number): number {
+  const value = Number(localStorage.getItem(key));
+  return Number.isFinite(value) && value > 0 ? value : fallback;
+}
+
 export default function RoadmapPage() {
   const [text, setText] = useState('');
   const [active, setActive] = useState<DragCourse | null>(null);
@@ -60,10 +65,7 @@ export default function RoadmapPage() {
     setActive((e.active.data.current?.course as DragCourse | undefined) ?? null);
   }
 
-  function storedNumber(key: string, fallback: number): number {
-    const value = Number(localStorage.getItem(key));
-    return Number.isFinite(value) && value > 0 ? value : fallback;
-  }
+
 
   function handleDragEnd(e: DragEndEvent) {
     setActive(null);
