@@ -33,6 +33,35 @@ class PlanGeneratorTest {
     }
 
     @Test
+    void semestersBelowTheMinimumAreFlaggedExceptTheLastOne() {
+        // B 1 needs A 1, so semester 0 holds only A 1 (3 credits) and semester 1 only B 1
+        var result = PlanGenerator.generate(
+                List.of(c("A 1", null), c("B 1", course("A 1"))), Set.of(),
+                new PlanGenerator.Settings(2025, "FALL", 8, 12, 18));
+
+        assertThat(result.lightSemesters()).hasSize(1);
+        assertThat(result.lightSemesters().get(0).credits()).isEqualTo(3);
+    }
+
+    @Test
+    void noMinimumMeansNothingIsFlagged() {
+        var result = PlanGenerator.generate(
+                List.of(c("A 1", null), c("B 1", course("A 1"))), Set.of(), settings(8, 18));
+
+        assertThat(result.lightSemesters()).isEmpty();
+    }
+
+    @Test
+    void semesterTotalIsMeasuredOncePerSemester() {
+        // Semester 0 holds five 3-credit courses (15 credits). F 1 needs A 1, so it lands in semester 1.
+        var result = PlanGenerator.generate(
+                List.of(c("A 1", null), c("B 1", null), c("C 1", null),
+                        c("D 1", null), c("E 1", null), c("F 1", course("A 1"))),
+                Set.of(), new PlanGenerator.Settings(2025, "FALL", 8, 12, 18));
+
+        assertThat(result.lightSemesters()).isEmpty();
+    }
+    @Test
     void creditLimitIsRespected() {
         var result = PlanGenerator.generate(
                 List.of(c("A 1", null), c("B 1", null), c("C 1", null)), Set.of(), settings(8, 6));

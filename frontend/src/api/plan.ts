@@ -6,7 +6,13 @@ export async function getPlan(): Promise<Plan> {
   return res.data;
 }
 
-export async function generatePlan(maxCredits: number): Promise<GenerationResult> {
-  const res = await api.post<GenerationResult>('/api/me/plan/generate', { maxCredits });
+export async function generatePlan(
+  minCredits: number,
+  maxCredits: number,
+): Promise<GenerationResult> {
+  const res = await api.post<GenerationResult>('/api/me/plan/generate', {
+    minCredits,
+    maxCredits,
+  });
   return res.data;
 }

@@ -78,6 +78,7 @@ export type GenerationResult = {
   coursesPlaced: number;
   semestersUsed: number;
   unplaced: { code: string; reason: string }[];
+  lightSemesters: { label: string; credits: number }[];
 };
 
 export type User = {

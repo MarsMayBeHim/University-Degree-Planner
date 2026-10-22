@@ -67,9 +67,9 @@ frontend/   React app
 - [x] Roadmap with drag and drop and prerequisite warnings
 - [x] Automatic plan generation
 - [x] Accounts and login
-- [ ] Remaining requirement groups, so plans cover the full degree
+- [x] Remaining requirement groups, so plans cover the full degree
 - [ ] Verified prerequisites and offered terms for every course
-- [ ] Integration tests and CI
+- [x] Integration tests and CI
 - [ ] More majors
 
 ## Authors
