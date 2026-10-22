@@ -1,7 +1,7 @@
 # University Degree Planner
 ![CI](https://github.com/MarsMayBeHim/university-degree-planner/actions/workflows/ci.yml/badge.svg)
 
-![LINK](https://university-degree-planner-1.onrender.com/)
+**Live Demo:** [View Project](https://university-degree-planner-1.onrender.com/)
 
 **Plan your whole degree, from first semester to graduation.**
 
