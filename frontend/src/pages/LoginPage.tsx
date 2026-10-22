@@ -71,6 +71,7 @@ export default function LoginPage() {
         </label>
         {error && <p className="warn">{error}</p>}
         <button type="submit" disabled={busy}>
+          {busy && <p><small>The server may take up to a minute to wake up on first use.</small></p>}
           {mode === 'login' ? 'Log in' : 'Create account'}
         </button>
       </form>
