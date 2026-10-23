@@ -56,9 +56,10 @@ class ApiFlowTest {
     }
 
     private void chooseProgram(String token) throws Exception {
-        String programId = firstMatch(send("GET", "/api/programs", null, null).body(), "\"id\":(\\d+)");
+        String programId = firstMatch(send("GET", "/api/programs", null, null).body(),
+            "\"id\":(\\d+),\"name\":\"Computer Science\"");
         var res = send("PUT", "/api/me/profile", token,
-                "{\"programId\":" + programId + ",\"startYear\":2025,\"startTerm\":\"FALL\"}");
+            "{\"programId\":" + programId + ",\"startYear\":2025,\"startTerm\":\"FALL\"}");
         assertThat(res.statusCode()).isEqualTo(200);
     }
 
