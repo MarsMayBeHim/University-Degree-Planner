@@ -72,6 +72,11 @@ class ApiFlowTest {
         assertThat(courses.body()).contains("CS 110");
 
         assertThat(send("GET", "/api/programs", null, null).body()).contains("Computer Science");
+        String csId = firstMatch(send("GET", "/api/programs", null, null).body(),
+                "\"id\":(\\d+),\"name\":\"Computer Science\"");
+        var map = send("GET", "/api/programs/" + csId + "/prerequisites", null, null);
+        assertThat(map.statusCode()).isEqualTo(200);
+        assertThat(map.body()).contains("\"code\":\"CS 211\"");
     }
 
     @Test

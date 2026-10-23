@@ -81,6 +81,21 @@ export type GenerationResult = {
   lightSemesters: { label: string; credits: number }[];
 };
 
+export type PrereqNode = {
+  type: 'COURSE' | 'AND' | 'OR';
+  code: string | null;
+  children: PrereqNode[];
+};
+
+export type PrereqCourse = {
+  id: number;
+  code: string;
+  title: string;
+  credits: number;
+  prereqText: string | null;
+  prereqTree: PrereqNode | null;
+};
+
 export type User = {
   id: number;
   email: string;
