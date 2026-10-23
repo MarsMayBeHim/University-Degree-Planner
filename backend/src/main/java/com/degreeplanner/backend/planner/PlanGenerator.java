@@ -27,6 +27,13 @@ public final class PlanGenerator {
 
     public record Result(List<Placement> placements, List<Unplaced> unplaced, List<LightSemester> lightSemesters) {}
 
+    /** Numeric part of a code like "CS 211", or 0 when there isn't one. */
+    private static int level(String code) {
+        int space = code.indexOf(' ');
+        String digits = space < 0 ? "" : code.substring(space + 1).replaceAll("\\D.*$", "");
+        return digits.isEmpty() ? 0 : Integer.parseInt(digits);
+    }
+
     private PlanGenerator() {}
 
     public static Result generate(Collection<PlanCourse> needed, Set<String> completed, Settings settings) {
@@ -52,6 +59,7 @@ public final class PlanGenerator {
                     .filter(c -> c.terms().isEmpty() || c.terms().contains(semTerm))
                     .filter(c -> PrerequisiteEvaluator.isSatisfied(c.tree(), available))
                     .sorted(Comparator.comparingInt((PlanCourse c) -> -depth.get(c.code()))
+                            .thenComparingInt(c -> level(c.code()))
                             .thenComparing(PlanCourse::code))
                     .toList();
 

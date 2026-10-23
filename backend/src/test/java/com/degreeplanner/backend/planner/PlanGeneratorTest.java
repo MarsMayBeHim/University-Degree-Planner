@@ -61,6 +61,14 @@ class PlanGeneratorTest {
 
         assertThat(result.lightSemesters()).isEmpty();
     }
+
+    @Test
+    void lowerLevelCoursesComeFirstWhenNothingElseDecides() {
+        var result = PlanGenerator.generate(
+                List.of(c("HI 489", null), c("HAP 201", null)), Set.of(), settings(8, 3));
+        assertThat(semesterOf(result, "HAP 201")).isEqualTo(0);
+        assertThat(semesterOf(result, "HI 489")).isEqualTo(1);
+    }
     @Test
     void creditLimitIsRespected() {
         var result = PlanGenerator.generate(
