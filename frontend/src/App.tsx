@@ -9,6 +9,7 @@ import LoginPage from './pages/LoginPage';
 import MyCoursesPage from './pages/MyCoursesPage';
 import ProfilePage from './pages/ProfilePage';
 import RoadmapPage from './pages/RoadmapPage';
+import PrerequisiteMapPage from './pages/PrerequisiteMapPage';  
 
 function Home() {
   const health = useQuery({
@@ -54,6 +55,7 @@ export default function App() {
             <Link to="/dashboard">Dashboard</Link>
             <Link to="/roadmap">Roadmap</Link>
             <Link to="/profile">Profile</Link>
+            <Link to="/prerequisites">Prerequisites</Link>
           </>
         )}
         <span className="spacer" />
@@ -75,6 +77,7 @@ export default function App() {
           <Route path="/my-courses" element={<Protected><MyCoursesPage /></Protected>} />
           <Route path="/dashboard" element={<Protected><DashboardPage /></Protected>} />
           <Route path="/roadmap" element={<Protected><RoadmapPage /></Protected>} />
+          <Route path="/prerequisites" element={<Protected><PrerequisiteMapPage /></Protected>} />
         </Routes>
       </main>
     </>
