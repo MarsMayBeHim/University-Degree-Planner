@@ -1,11 +1,13 @@
 import type { ReactNode } from 'react';
 import { useDraggable } from '@dnd-kit/core';
+import type { CourseStatus } from '../types';
 
 export type DragCourse = {
   courseId: number;
   code: string;
   title: string;
   credits: number;
+  status?: CourseStatus | null;
 };
 
 type Props = {

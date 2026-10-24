@@ -80,6 +80,29 @@ class ApiFlowTest {
     }
 
     @Test
+    void completedCoursesKeepTheirSemesterAndGenerationStartsAfterThem() throws Exception {
+        String token = newToken();
+        chooseProgram(token);
+
+        var saved = send("POST", "/api/me/courses", token,
+                "{\"courseId\":" + cs110Id() + ",\"status\":\"COMPLETED\",\"plannedYear\":2025,\"plannedTerm\":\"FALL\"}");
+        assertThat(saved.statusCode()).isEqualTo(200);
+
+        var plan = send("GET", "/api/me/plan", token, null);
+        assertThat(plan.body()).contains("\"status\":\"COMPLETED\"").contains("CS 110");
+
+        var generated = send("POST", "/api/me/plan/generate", token, "{\"maxCredits\":16}");
+        assertThat(generated.statusCode()).isEqualTo(200);
+        assertThat(generated.body()).contains("\"startLabel\":\"Spring 2026\"");
+
+        // Marking it completed again without a semester must not erase the semester
+        send("POST", "/api/me/courses", token,
+                "{\"courseId\":" + cs110Id() + ",\"status\":\"COMPLETED\"}");
+        var after = send("GET", "/api/me/courses", token, null);
+        assertThat(after.body()).contains("\"plannedYear\":2025");
+    }
+
+    @Test
     void protectedEndpointsRejectMissingOrBadTokens() throws Exception {
         for (String path : new String[] {"/api/me", "/api/me/courses", "/api/me/progress", "/api/me/plan"}) {
             assertThat(send("GET", path, null, null).statusCode()).as(path).isEqualTo(401);

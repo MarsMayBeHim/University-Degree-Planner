@@ -9,6 +9,7 @@ import com.degreeplanner.backend.planner.PlanCourse;
 import com.degreeplanner.backend.planner.PlanGenerator;
 import com.degreeplanner.backend.planner.PrereqTreeParser;
 import com.degreeplanner.backend.planner.RequirementSelector;
+import com.degreeplanner.backend.planner.Semesters;
 import com.degreeplanner.backend.repository.AppUserRepository;
 import com.degreeplanner.backend.repository.CourseRepository;
 import com.degreeplanner.backend.repository.StudentCourseRepository;
@@ -43,19 +44,28 @@ public class PlanGenerationService {
     }
 
     @Transactional
-    public GenerationResultDto generate(Long userId, int minCredits, int maxCredits) {
+    public GenerationResultDto generate(Long userId, int minCredits, int maxCredits,
+                                        Integer fromYear, String fromTerm) {
         if (maxCredits < 3 || maxCredits > 24) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "maxCredits must be between 3 and 24");
         }
         if (minCredits < 0 || minCredits > maxCredits) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "minCredits must be between 0 and maxCredits");
         }
+        if ((fromYear == null) != (fromTerm == null)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "fromYear and fromTerm go together");
+        }
+        if (fromTerm != null && !Set.of("FALL", "SPRING").contains(fromTerm)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "fromTerm must be FALL or SPRING");
+        }
+
         AppUser user = users.findById(userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
         if (user.getProgramId() == null || user.getStartYear() == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Choose a program and start term first");
         }
         String startTerm = "SPRING".equals(user.getStartTerm()) ? "SPRING" : "FALL";
+        int startYear = user.getStartYear();
 
         List<RequirementGroupDto> tree = programService.requirementTree(user.getProgramId());
         Set<Long> treeIds = new HashSet<>();
@@ -68,11 +78,27 @@ public class PlanGenerationService {
         courses.findAllById(allIds).forEach(c -> byId.put(c.getId(), c));
 
         Set<String> done = new HashSet<>();
+        int lastTakenIndex = -1;
         for (StudentCourse r : rows) {
             if (TAKEN.contains(r.getStatus())) {
                 done.add(code(byId.get(r.getCourseId())));
+                if (r.getPlannedYear() != null && r.getPlannedTerm() != null) {
+                    lastTakenIndex = Math.max(lastTakenIndex,
+                            Semesters.indexOf(startYear, startTerm, r.getPlannedYear(), r.getPlannedTerm()));
+                }
             }
         }
+
+        // Planning starts after the latest semester holding a completed or in-progress course
+        int fromIndex = fromYear != null
+                ? Semesters.indexOf(startYear, startTerm, fromYear, fromTerm)
+                : Math.max(lastTakenIndex + 1, 0);
+        if (fromIndex < 0 || fromIndex >= SEMESTER_COUNT) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "No semesters are left to plan. Move completed courses earlier or choose another start.");
+        }
+        int planYear = Semesters.yearAt(startYear, startTerm, fromIndex);
+        String planTerm = Semesters.termAt(startYear, startTerm, fromIndex);
 
         Map<Long, Set<String>> offerings = loadOfferings();
         Map<String, PlanCourse> known = new LinkedHashMap<>();
@@ -88,9 +114,10 @@ public class PlanGenerationService {
         PlanGenerator.Result result;
         try {
             result = PlanGenerator.generate(needed, done,
-            new PlanGenerator.Settings(user.getStartYear(), startTerm, SEMESTER_COUNT, minCredits, maxCredits));
+                    new PlanGenerator.Settings(planYear, planTerm, SEMESTER_COUNT - fromIndex,
+                            minCredits, maxCredits));
         } catch (IllegalStateException e) {
-            throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_CONTENT, e.getMessage());
+            throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, e.getMessage());
         }
 
         // Replace the old plan. Completed and in-progress rows are left alone.
@@ -112,7 +139,8 @@ public class PlanGenerationService {
         List<GenerationResultDto.LightSemester> light = result.lightSemesters().stream()
                 .map(s -> new GenerationResultDto.LightSemester(label(s.term(), s.year()), s.credits()))
                 .toList();
-        return new GenerationResultDto(result.placements().size(), semestersUsed, unplaced, light);
+        return new GenerationResultDto(result.placements().size(), semestersUsed,
+                label(planTerm, planYear), unplaced, light);
     }
 
     private Map<Long, Set<String>> loadOfferings() {
@@ -133,6 +161,7 @@ public class PlanGenerationService {
     private static String code(Course c) {
         return c.getSubject() + " " + c.getNumber();
     }
+
     private static String label(String term, int year) {
         return term.charAt(0) + term.substring(1).toLowerCase() + " " + year;
     }
