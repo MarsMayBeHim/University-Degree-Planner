@@ -6,6 +6,7 @@ export type SaveCourseRequest = {
   status: CourseStatus;
   plannedYear?: number;
   plannedTerm?: string;
+  clearSchedule?: boolean;
 };
 
 export async function getMyCourses(): Promise<StudentCourse[]> {

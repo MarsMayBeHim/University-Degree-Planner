@@ -7,4 +7,5 @@ public record SaveStudentCourseRequest(
         @NotNull Long courseId,
         @NotNull @Pattern(regexp = "COMPLETED|IN_PROGRESS|PLANNED") String status,
         Integer plannedYear,
-        String plannedTerm) {}
+        String plannedTerm,
+        Boolean clearSchedule) {}

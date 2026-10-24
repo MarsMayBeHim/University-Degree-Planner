@@ -47,18 +47,28 @@ public class StudentCourseService {
         Course course = courses.findById(req.courseId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Course not found"));
 
-        if (req.plannedTerm() != null && !TERMS.contains(req.plannedTerm())) {
+        boolean hasYear = req.plannedYear() != null;
+        boolean hasTerm = req.plannedTerm() != null;
+        if (hasYear != hasTerm) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "plannedYear and plannedTerm go together");
+        }
+        if (hasTerm && !TERMS.contains(req.plannedTerm())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "plannedTerm must be FALL, SPRING or SUMMER");
         }
-        if ("PLANNED".equals(req.status()) && (req.plannedYear() == null || req.plannedTerm() == null)) {
+        if ("PLANNED".equals(req.status()) && !hasYear) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "PLANNED courses need plannedYear and plannedTerm");
         }
 
         StudentCourse row = studentCourses.findByUserIdAndCourseId(userId, req.courseId())
                 .orElseGet(() -> new StudentCourse(userId, req.courseId()));
         row.setStatus(req.status());
-        row.setPlannedYear(req.plannedYear());
-        row.setPlannedTerm(req.plannedTerm());
+        if (hasYear) {
+            row.setPlannedYear(req.plannedYear());
+            row.setPlannedTerm(req.plannedTerm());
+        } else if (Boolean.TRUE.equals(req.clearSchedule())) {
+            row.setPlannedYear(null);
+            row.setPlannedTerm(null);
+        }
         return toDto(studentCourses.save(row), course);
     }
 

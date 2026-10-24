@@ -43,6 +43,8 @@ public class PlanController {
         int max = request == null || request.maxCredits() == null
                 ? DEFAULT_MAX_CREDITS
                 : request.maxCredits();
-        return generationService.generate(CurrentUser.id(jwt), min, max);
+        Integer fromYear = request == null ? null : request.fromYear();
+        String fromTerm = request == null ? null : request.fromTerm();
+        return generationService.generate(CurrentUser.id(jwt), min, max, fromYear, fromTerm);
     }
 }

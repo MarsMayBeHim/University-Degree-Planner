@@ -56,10 +56,11 @@ public class PlanService {
                 .stream()
                 .collect(Collectors.toMap(Course::getId, c -> c));
 
-        // Completed and in-progress courses are available before the first semester
+        // Courses taken without a semester count as done before the first semester
         Set<String> available = new HashSet<>();
         for (StudentCourse row : rows) {
-            if ("COMPLETED".equals(row.getStatus()) || "IN_PROGRESS".equals(row.getStatus())) {
+            boolean taken = "COMPLETED".equals(row.getStatus()) || "IN_PROGRESS".equals(row.getStatus());
+            if (taken && row.getPlannedYear() == null) {
                 available.add(code(byId.get(row.getCourseId())));
             }
         }
@@ -72,28 +73,31 @@ public class PlanService {
             final int semYear = year;
             final String semTerm = term;
 
-            List<Course> inSemester = rows.stream()
-                    .filter(r -> "PLANNED".equals(r.getStatus())
+            List<StudentCourse> inSemester = rows.stream()
+                    .filter(r -> r.getPlannedYear() != null
                             && Objects.equals(r.getPlannedYear(), semYear)
                             && semTerm.equals(r.getPlannedTerm()))
-                    .map(r -> byId.get(r.getCourseId()))
-                    .sorted(Comparator.comparing(Course::getSubject).thenComparing(Course::getNumber))
+                    .sorted(Comparator.comparing((StudentCourse r) -> byId.get(r.getCourseId()).getSubject())
+                            .thenComparing(r -> byId.get(r.getCourseId()).getNumber()))
                     .toList();
 
             BigDecimal credits = BigDecimal.ZERO;
             List<PlannedCourseDto> planned = new ArrayList<>();
-            for (Course c : inSemester) {
+            for (StudentCourse r : inSemester) {
+                Course c = byId.get(r.getCourseId());
+                boolean done = "COMPLETED".equals(r.getStatus());
                 PrereqNode tree = PrereqTreeParser.parse(c.getPrereqTree());
-                List<String> missing = PrerequisiteEvaluator.isSatisfied(tree, available)
+                // Completed courses are history, so they never get warnings
+                List<String> missing = done || PrerequisiteEvaluator.isSatisfied(tree, available)
                         ? List.of()
                         : List.copyOf(PrerequisiteEvaluator.unmetCodes(tree, available));
                 planned.add(new PlannedCourseDto(c.getId(), code(c), c.getTitle(),
-                        c.getCreditsMin(), c.getPrereqText(), missing));
+                        c.getCreditsMin(), c.getPrereqText(), missing, r.getStatus()));
                 credits = credits.add(c.getCreditsMin());
             }
 
             // Courses count as prerequisites only for LATER semesters
-            inSemester.forEach(c -> available.add(code(c)));
+            inSemester.forEach(r -> available.add(code(byId.get(r.getCourseId()))));
             semesters.add(new SemesterDto(semYear, semTerm, label(semTerm, semYear), credits, planned));
 
             if ("FALL".equals(term)) {

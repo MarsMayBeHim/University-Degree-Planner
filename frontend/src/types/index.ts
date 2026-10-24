@@ -58,6 +58,7 @@ export type PlannedCourse = {
   credits: number;
   prereqText: string | null;
   missingPrereqs: string[];
+  status: CourseStatus;
 };
 
 export type Semester = {
@@ -77,6 +78,7 @@ export type Plan = {
 export type GenerationResult = {
   coursesPlaced: number;
   semestersUsed: number;
+  startLabel: string;
   unplaced: { code: string; reason: string }[];
   lightSemesters: { label: string; credits: number }[];
 };

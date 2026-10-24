@@ -9,4 +9,5 @@ public record PlannedCourseDto(
         String title,
         BigDecimal credits,
         String prereqText,
-        List<String> missingPrereqs) {}
+        List<String> missingPrereqs,
+        String status) {}
